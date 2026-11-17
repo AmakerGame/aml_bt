@@ -1656,15 +1656,22 @@ static int amlbt_drv_insmod(void)
         glob_t wifi_glob, bt_glob;
         ret = glob(WIFI_DRV_PATH, 0, NULL, &wifi_glob);
         if (ret != 0) {
-            ALOGE("Can't find WiFi driver path: %s", WIFI_DRV_PATH);
-            return -1;
+            /* Armbian-style flat layout: modules live directly in /lib/modules/<kver>/ */
+            ret = glob("/lib/modules/*", 0, NULL, &wifi_glob);
+            if (ret != 0) {
+                ALOGE("Can't find WiFi driver path: %s", WIFI_DRV_PATH);
+                return -1;
+            }
         }
 
         ret = glob(BT_DRV_PATH, 0, NULL, &bt_glob);
         if (ret != 0) {
-            ALOGE("Can't find BT driver path: %s", BT_DRV_PATH);
-            globfree(&wifi_glob);
-            return -1;
+            ret = glob("/lib/modules/*", 0, NULL, &bt_glob);
+            if (ret != 0) {
+                ALOGE("Can't find BT driver path: %s", BT_DRV_PATH);
+                globfree(&wifi_glob);
+                return -1;
+            }
         }
 
         for (j = 0; j < MOD_MAX_NUM; j++) {
