@@ -549,8 +549,7 @@ static int set_power_type(void)
     }
 
     if (!write_power_type(&power_type, sizeof(char))) {
-        ALOGE("write power type failed");
-        return -1;
+        ALOGE("write power type failed (no btpower_evt - continuing)");
     }
 
     clr_bt_power_bit(power_type);
