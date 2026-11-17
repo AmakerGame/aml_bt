@@ -94,7 +94,7 @@ typedef  enum {
 #define BT_WAKE_EVT_2 "/sys/module/bt_device/parameters/btwake_evt"
 
 #ifndef UART_DEV_PORT_BT
-#define UART_DEV_PORT_BT      "/dev/ttyS1"
+#define UART_DEV_PORT_BT      "/dev/ttyS2"
 #endif
 
 // Manufacturer vendor info

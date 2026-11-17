@@ -1356,15 +1356,16 @@ static void aml_flow_control(int fd, int opt)
 {
     struct termios c_opt;
 
-    ioctl(fd, TIOCMGET, &c_opt);
-    c_opt.c_cc[VTIME] = 0; /* inter-character timer unused */
-    c_opt.c_cc[VMIN] = 0; /* blocking read until 8 chars received */
+    if (tcgetattr(fd, &c_opt) < 0) {
+        ALOGE("Can't get port settings");
+        return;
+    }
     c_opt.c_cflag &= ~CSIZE;
     c_opt.c_cflag |= (CS8 | CLOCAL | CREAD);
     if (MSM_ENABLE_FLOW_CTRL)
         c_opt.c_cflag |= CRTSCTS;
     else if (MSM_DISABLE_FLOW_CTRL)
-        c_opt.c_cflag |= ~CRTSCTS;
+        c_opt.c_cflag &= ~CRTSCTS;
     else {
         ALOGE("Incorrect option passed for TIOCMSET");
         return;
@@ -1372,7 +1373,7 @@ static void aml_flow_control(int fd, int opt)
     c_opt.c_iflag = IGNPAR;
     c_opt.c_oflag = 0;
     c_opt.c_lflag = 0;
-    ioctl(fd, TIOCMSET, &c_opt);
+    tcsetattr(fd, TCSANOW, &c_opt);
 }
 
 
